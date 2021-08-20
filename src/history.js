@@ -1,5 +1,30 @@
-(function () {
-    L.HistoryControl = L.Control.extend({
+(function (factory) {
+    // Module systems magic dance, Leaflet edition
+    if (typeof define === 'function' && define.amd) {
+        // AMD
+        define(['leaflet'], factory);
+    } else if (typeof module !== 'undefined') {
+        // Node/CommonJS
+        module.exports = factory(require('leaflet'));
+    } else {
+        // Browser globals
+        if (typeof this.L === 'undefined')
+            throw 'Leaflet must be loaded first!';
+        // Namespace
+        this.L.HistoryControl = this.L.hc = factory(this.L);
+    }
+}(function (L) {
+
+    var hc = {};
+
+    hc.ZoomCenter = L.Class.extend({
+        initialize: function(zoom, centerPoint) {
+            this.zoom = zoom;
+            this.centerPoint = centerPoint;
+        }
+    });
+
+    hc.HistoryControl = L.Control.extend({
         options: {
             position: 'topright',
             maxMovesToSave: 10, //set to 0 for unlimited
@@ -174,7 +199,7 @@
             }
         },
         _buildZoomCenterObjectFromCurrent:function(map) {
-            return new L.ZoomCenter(map.getZoom(), map.getCenter());
+            return new hc.ZoomCenter(map.getZoom(), map.getCenter());
         },
         _addMapListeners: function() {
             var _this = this;
@@ -193,4 +218,6 @@
             });
         }
     });
-}());
+
+    return hc;
+}));
